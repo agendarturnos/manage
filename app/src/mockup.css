@@ -1,0 +1,117 @@
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f6f6fa; margin: 0; padding: 0;}
+    .contenedor { max-width: 880px; margin: 48px auto 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 18px #d8d8f2; padding: 34px 34px 28px 34px; }
+    h2 { color: #3949ab; letter-spacing: 1px; margin-bottom: 24px;}
+    .screen-set-filtros {
+      display: flex; gap: 18px; flex-wrap: wrap;
+      background: #f2f3fb; border-radius: 10px; padding: 18px 18px 12px 18px; margin-bottom: 24px;
+      border: 1.5px solid #e1e2f6;
+    }
+    .screen-set-filtros label { font-size: 0.99em; color: #444; margin-bottom: 4px; display: block;}
+    .screen-set-filtros input {
+      padding: 8px 9px; border: 1px solid #c7cbe2; border-radius: 6px; min-width: 145px; background: #fff;
+      font-size: 1em; margin-bottom: 0;
+    }
+    .screen-set-filtros .acciones { display: flex; flex-direction: column; justify-content: flex-end; gap: 7px;}
+    .screen-set-filtros button {
+      padding: 8px 18px; border-radius: 6px; border: none; font-weight: 500; font-size: 1em; cursor: pointer;
+    }
+    .btn-buscar { background: #5c6bc0; color: #fff; }
+    .btn-buscar:hover { background: #3949ab; }
+    .btn-limpiar { background: #ededf8; color: #3949ab; border: 1px solid #bfc4e3; }
+    .btn-limpiar:hover { background: #dde2fd;}
+    table { width: 100%; border-collapse: collapse; background: #fff;}
+    th, td { padding: 11px 10px; border-bottom: 1.5px solid #f1f1fb;}
+    th { background: #e6eafe; color: #4550a4; font-size: 1.03em;}
+    tr:last-child td { border-bottom: none; }
+    tr.no-result td { text-align: center; color: #888; }
+    tr:hover:not(.no-result):not(.seleccionado) { background: #eef2fa; transition: background 0.18s;}
+    .ver-pagos-btn {
+      background: #e7ebfb;
+      border: 1px solid #b2c1ef;
+      color: #46509d;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 0.97em;
+      cursor: pointer;
+      transition: background 0.18s;
+      margin-left: 6px;
+    }
+    .ver-pagos-btn:hover { background: #ccd7f5; color: #3949ab; }
+    .badge-pagos {
+      background: #5c6bc0;
+      color: #fff;
+      font-size: 0.81em;
+      font-weight: 600;
+      border-radius: 16px;
+      padding: 2.5px 11px 2.5px 9px;
+      margin-left: 6px;
+      vertical-align: middle;
+      display: inline-block;
+      min-width: 28px;
+      text-align: center;
+    }
+    tr.seleccionado { background: #dbe5fc !important; }
+    .panel-pagos {
+      background: #f7f8ff; border-radius: 14px; box-shadow: 0 1px 8px #e5eaff;
+      margin: 18px 0 10px 0; padding: 22px 18px 28px 18px;
+      animation: fadein 0.4s;
+      position: relative;
+    }
+    .panel-pagos h3 { margin-top: 0; color: #3949ab; font-size: 1.13em; margin-bottom: 16px;}
+    .panel-pagos .info-cliente {
+      font-size: 1.04em; color: #5c6bc0;
+      margin-bottom: 6px; font-weight: 600;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .panel-pagos .info-cliente i { font-size: 1.2em; }
+    .panel-pagos .close-panel {
+      position: absolute; right: 16px; top: 18px; color: #789; cursor: pointer; font-size: 1.38em; background: none; border: none; }
+    .panel-pagos .close-panel:hover { color: #222; }
+    .panel-pagos table { margin-top: 10px; border: none; background: none; }
+    .panel-pagos th, .panel-pagos td { background: none; border-bottom: 1px solid #e3e9f7; }
+    .panel-pagos th { background: #eef2fa; position: sticky; top: 0; z-index: 1; }
+    .proximo-vencido { color: #b61832; font-weight: bold; }
+    .panel-pagos .sin-pagos {
+      color: #7e86b8; font-size: 1.02em; margin: 16px 0;
+    }
+    .panel-pagos .btn-agregar, .panel-pagos .btn-cancelar, .panel-pagos .btn-guardar, .panel-pagos .btn-eliminar, .panel-pagos .btn-editar {
+      background: #5c6bc0; color: #fff; border: none;
+      border-radius: 7px; padding: 7px 14px; margin-top: 7px;
+      font-size: 0.98em; cursor: pointer; font-weight: 500;
+      transition: background 0.18s;
+    }
+    .panel-pagos .btn-eliminar { background: #d32f2f; }
+    .panel-pagos .btn-eliminar:hover { background: #b71c1c; }
+    .panel-pagos .btn-editar { background: #90caf9; color: #222;}
+    .panel-pagos .btn-editar:hover { background: #3e74c5; color: #fff;}
+    .panel-pagos .btn-agregar:hover, .panel-pagos .btn-cancelar:hover, .panel-pagos .btn-guardar:hover { background: #3949ab; }
+    .form-agregar, .form-editar {
+      display: flex; gap: 12px; flex-wrap: wrap; background: #e6eafe; border-radius: 8px; padding: 13px 11px; margin-bottom: 8px; margin-top: 8px;
+      box-shadow: 0 2px 8px #e3eaff;
+      align-items: flex-end;
+      animation: fadein 0.15s;
+    }
+    .form-agregar label, .form-editar label { font-size: 0.97em; color: #444; margin-bottom: 4px; display: block;}
+    .form-agregar input[type="number"], .form-agregar input[type="date"],
+    .form-editar input[type="number"], .form-editar input[type="date"] {
+      padding: 6px 8px; border-radius: 5px; border: 1px solid #9dadde;
+      font-size: 0.99em; margin-bottom: 0;
+    }
+    .form-agregar .acciones, .form-editar .acciones { display: flex; flex-direction: row; gap: 7px; }
+    .error-msg { color: #b61832; font-size: 0.99em; margin-bottom: 9px;}
+    .acciones-pago {
+      display: flex; flex-direction: row; gap: 9px; justify-content: center; align-items: center;
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(18px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+    @media (max-width: 700px) {
+      .contenedor { padding: 9px 2vw; }
+      .screen-set-filtros { flex-direction: column; gap: 6px;}
+      .screen-set-filtros input { width: 100%; min-width: 0; }
+      .panel-pagos { padding: 12px 2vw;}
+      .panel-pagos .info-cliente { flex-direction: column; align-items: flex-start;}
+      .form-agregar, .form-editar { flex-direction: column; gap: 7px;}
+      .acciones-pago { flex-direction: column; gap: 6px;}
+    }
