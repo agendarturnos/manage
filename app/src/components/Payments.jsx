@@ -36,17 +36,56 @@ export default function Payments({ client }) {
     setPayments(data);
   };
 
-  if (!client) return <div>Selecciona un cliente para ver sus pagos</div>;
+  if (!client) return null;
 
   return (
-    <div>
-      <h3>Pagos para {client.nombre}</h3>
-      <form onSubmit={addPayment} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        <input required type="number" placeholder="Monto" value={form.monto} onChange={e => setForm(f => ({ ...f, monto: e.target.value }))} />
-        <input required type="date" placeholder="Fecha" value={form.fecha} onChange={e => setForm(f => ({ ...f, fecha: e.target.value }))} />
-        <input required type="date" placeholder="Próximo" value={form.proximo} onChange={e => setForm(f => ({ ...f, proximo: e.target.value }))} />
-        <input required type="number" placeholder="Meses" value={form.meses} onChange={e => setForm(f => ({ ...f, meses: e.target.value }))} />
-        <button>Agregar</button>
+    <div className="panel-pagos">
+      <div className="info-cliente">
+        {client.nombre} &bull; {client.email}
+      </div>
+      <h3>Pagos registrados</h3>
+      <form className="form-agregar" onSubmit={addPayment}>
+        <div>
+          <label>Monto ($):</label>
+          <input
+            type="number"
+            required
+            value={form.monto}
+            onChange={e => setForm(f => ({ ...f, monto: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label>Fecha:</label>
+          <input
+            type="date"
+            required
+            value={form.fecha}
+            onChange={e => setForm(f => ({ ...f, fecha: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label>Próximo pago:</label>
+          <input
+            type="date"
+            required
+            value={form.proximo}
+            onChange={e => setForm(f => ({ ...f, proximo: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label>Meses pagados:</label>
+          <input
+            type="number"
+            required
+            value={form.meses}
+            onChange={e => setForm(f => ({ ...f, meses: e.target.value }))}
+          />
+        </div>
+        <div className="acciones">
+          <button type="submit" className="btn-agregar">
+            Agregar
+          </button>
+        </div>
       </form>
       <table>
         <thead>
@@ -60,7 +99,7 @@ export default function Payments({ client }) {
         <tbody>
           {payments.map(p => (
             <tr key={p.id}>
-              <td>{p.monto}</td>
+              <td>{'$' + p.monto}</td>
               <td>{p.fecha}</td>
               <td>{p.proximo}</td>
               <td>{p.meses}</td>

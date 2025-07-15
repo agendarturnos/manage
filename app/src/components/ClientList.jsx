@@ -27,29 +27,95 @@ export default function ClientList({ onSelect }) {
   );
 
   return (
-    <div>
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px' }}>
-        <input placeholder="ID" value={filters.companyId} onChange={e => setFilters(f => ({ ...f, companyId: e.target.value }))} />
-        <input placeholder="Nombre" value={filters.nombre} onChange={e => setFilters(f => ({ ...f, nombre: e.target.value }))} />
-        <input placeholder="Proyecto" value={filters.proyecto} onChange={e => setFilters(f => ({ ...f, proyecto: e.target.value }))} />
-        <input placeholder="Email" value={filters.email} onChange={e => setFilters(f => ({ ...f, email: e.target.value }))} />
-      </div>
+    <div className="contenedor">
+      <h2>Buscar Clientes</h2>
+      <form
+        className="screen-set-filtros"
+        onSubmit={e => {
+          e.preventDefault();
+        }}
+      >
+        <div>
+          <label htmlFor="fCompanyId">Company Id</label>
+          <input
+            id="fCompanyId"
+            type="text"
+            value={filters.companyId}
+            autoComplete="off"
+            onChange={e => setFilters(f => ({ ...f, companyId: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label htmlFor="fNombre">Nombre y Apellido</label>
+          <input
+            id="fNombre"
+            type="text"
+            value={filters.nombre}
+            autoComplete="off"
+            onChange={e => setFilters(f => ({ ...f, nombre: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label htmlFor="fProyecto">Nombre del Proyecto</label>
+          <input
+            id="fProyecto"
+            type="text"
+            value={filters.proyecto}
+            autoComplete="off"
+            onChange={e => setFilters(f => ({ ...f, proyecto: e.target.value }))}
+          />
+        </div>
+        <div>
+          <label htmlFor="fEmail">Email</label>
+          <input
+            id="fEmail"
+            type="text"
+            value={filters.email}
+            autoComplete="off"
+            onChange={e => setFilters(f => ({ ...f, email: e.target.value }))}
+          />
+        </div>
+        <div className="acciones">
+          <button type="submit" className="btn-buscar">
+            Buscar
+          </button>
+          <button
+            type="button"
+            className="btn-limpiar"
+            onClick={() =>
+              setFilters({ companyId: '', nombre: '', proyecto: '', email: '' })
+            }
+          >
+            Limpiar
+          </button>
+        </div>
+      </form>
       <table>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Proyecto</th>
+            <th>Company Id</th>
+            <th>Nombre y Apellido</th>
+            <th>Nombre del Proyecto</th>
             <th>Email</th>
+            <th>Pagos</th>
           </tr>
         </thead>
         <tbody>
           {filtered.map(c => (
-            <tr key={c.id} onClick={() => onSelect && onSelect(c)} style={{ cursor: 'pointer' }}>
+            <tr key={c.id} className="fila-cliente">
               <td>{c.companyId}</td>
               <td>{c.nombre}</td>
               <td>{c.proyecto}</td>
               <td>{c.email}</td>
+              <td>
+                <button
+                  type="button"
+                  className="ver-pagos-btn"
+                  onClick={() => onSelect && onSelect(c)}
+                >
+                  Ver
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
