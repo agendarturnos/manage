@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Buscar Clientes</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f6f6fa; margin: 0; padding: 0;}
+    .contenedor { max-width: 880px; margin: 48px auto 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 18px #d8d8f2; padding: 34px 34px 28px 34px; }
+    h2 { color: #3949ab; letter-spacing: 1px; margin-bottom: 24px;}
+    .screen-set-filtros {
+      display: flex; gap: 18px; flex-wrap: wrap;
+      background: #f2f3fb; border-radius: 10px; padding: 18px 18px 12px 18px; margin-bottom: 24px;
+      border: 1.5px solid #e1e2f6;
+    }
+    .screen-set-filtros label { font-size: 0.99em; color: #444; margin-bottom: 4px; display: block;}
+    .screen-set-filtros input {
+      padding: 8px 9px; border: 1px solid #c7cbe2; border-radius: 6px; min-width: 145px; background: #fff;
+      font-size: 1em; margin-bottom: 0;
+    }
+    .screen-set-filtros .acciones { display: flex; flex-direction: column; justify-content: flex-end; gap: 7px;}
+    .screen-set-filtros button {
+      padding: 8px 18px; border-radius: 6px; border: none; font-weight: 500; font-size: 1em; cursor: pointer;
+    }
+    .btn-buscar { background: #5c6bc0; color: #fff; }
+    .btn-buscar:hover { background: #3949ab; }
+    .btn-limpiar { background: #ededf8; color: #3949ab; border: 1px solid #bfc4e3; }
+    .btn-limpiar:hover { background: #dde2fd;}
+    table { width: 100%; border-collapse: collapse; background: #fff;}
+    th, td { padding: 11px 10px; border-bottom: 1.5px solid #f1f1fb;}
+    th { background: #e6eafe; color: #4550a4; font-size: 1.03em;}
+    tr:last-child td { border-bottom: none; }
+    tr.no-result td { text-align: center; color: #888; }
+    tr:hover:not(.no-result):not(.seleccionado) { background: #eef2fa; transition: background 0.18s;}
+    .ver-pagos-btn {
+      background: #e7ebfb;
+      border: 1px solid #b2c1ef;
+      color: #46509d;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 0.97em;
+      cursor: pointer;
+      transition: background 0.18s;
+      margin-left: 6px;
+    }
+    .ver-pagos-btn:hover { background: #ccd7f5; color: #3949ab; }
+    .badge-pagos {
+      background: #5c6bc0;
+      color: #fff;
+      font-size: 0.81em;
+      font-weight: 600;
+      border-radius: 16px;
+      padding: 2.5px 11px 2.5px 9px;
+      margin-left: 6px;
+      vertical-align: middle;
+      display: inline-block;
+      min-width: 28px;
+      text-align: center;
+    }
+    tr.seleccionado { background: #dbe5fc !important; }
+    .panel-pagos {
+      background: #f7f8ff; border-radius: 14px; box-shadow: 0 1px 8px #e5eaff;
+      margin: 18px 0 10px 0; padding: 22px 18px 28px 18px;
+      animation: fadein 0.4s;
+      position: relative;
+    }
+    .panel-pagos h3 { margin-top: 0; color: #3949ab; font-size: 1.13em; margin-bottom: 16px;}
+    .panel-pagos .info-cliente {
+      font-size: 1.04em; color: #5c6bc0;
+      margin-bottom: 6px; font-weight: 600;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .panel-pagos .info-cliente i { font-size: 1.2em; }
+    .panel-pagos .close-panel {
+      position: absolute; right: 16px; top: 18px; color: #789; cursor: pointer; font-size: 1.38em; background: none; border: none; }
+    .panel-pagos .close-panel:hover { color: #222; }
+    .panel-pagos table { margin-top: 10px; border: none; background: none; }
+    .panel-pagos th, .panel-pagos td { background: none; border-bottom: 1px solid #e3e9f7; }
+    .panel-pagos th { background: #eef2fa; position: sticky; top: 0; z-index: 1; }
+    .proximo-vencido { color: #b61832; font-weight: bold; }
+    .panel-pagos .sin-pagos {
+      color: #7e86b8; font-size: 1.02em; margin: 16px 0;
+    }
+    .panel-pagos .btn-agregar, .panel-pagos .btn-cancelar, .panel-pagos .btn-guardar, .panel-pagos .btn-eliminar, .panel-pagos .btn-editar {
+      background: #5c6bc0; color: #fff; border: none;
+      border-radius: 7px; padding: 7px 14px; margin-top: 7px;
+      font-size: 0.98em; cursor: pointer; font-weight: 500;
+      transition: background 0.18s;
+    }
+    .panel-pagos .btn-eliminar { background: #d32f2f; }
+    .panel-pagos .btn-eliminar:hover { background: #b71c1c; }
+    .panel-pagos .btn-editar { background: #90caf9; color: #222;}
+    .panel-pagos .btn-editar:hover { background: #3e74c5; color: #fff;}
+    .panel-pagos .btn-agregar:hover, .panel-pagos .btn-cancelar:hover, .panel-pagos .btn-guardar:hover { background: #3949ab; }
+    .form-agregar, .form-editar {
+      display: flex; gap: 12px; flex-wrap: wrap; background: #e6eafe; border-radius: 8px; padding: 13px 11px; margin-bottom: 8px; margin-top: 8px;
+      box-shadow: 0 2px 8px #e3eaff;
+      align-items: flex-end;
+      animation: fadein 0.15s;
+    }
+    .form-agregar label, .form-editar label { font-size: 0.97em; color: #444; margin-bottom: 4px; display: block;}
+    .form-agregar input[type="number"], .form-agregar input[type="date"],
+    .form-editar input[type="number"], .form-editar input[type="date"] {
+      padding: 6px 8px; border-radius: 5px; border: 1px solid #9dadde;
+      font-size: 0.99em; margin-bottom: 0;
+    }
+    .form-agregar .acciones, .form-editar .acciones { display: flex; flex-direction: row; gap: 7px; }
+    .error-msg { color: #b61832; font-size: 0.99em; margin-bottom: 9px;}
+    .acciones-pago {
+      display: flex; flex-direction: row; gap: 9px; justify-content: center; align-items: center;
+    }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(18px);}
+      to   { opacity: 1; transform: translateY(0);}
+    }
+    @media (max-width: 700px) {
+      .contenedor { padding: 9px 2vw; }
+      .screen-set-filtros { flex-direction: column; gap: 6px;}
+      .screen-set-filtros input { width: 100%; min-width: 0; }
+      .panel-pagos { padding: 12px 2vw;}
+      .panel-pagos .info-cliente { flex-direction: column; align-items: flex-start;}
+      .form-agregar, .form-editar { flex-direction: column; gap: 7px;}
+      .acciones-pago { flex-direction: column; gap: 6px;}
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.295.0/font/lucide.css">
+</head>
+<body>
+  <div class="contenedor">
+    <h2>Buscar Clientes</h2>
+    <form class="screen-set-filtros" id="formFiltros" onsubmit="buscarClientes(event)">
+      <div>
+        <label for="fCompanyId">Company Id</label>
+        <input type="text" id="fCompanyId" autocomplete="off">
+      </div>
+      <div>
+        <label for="fNombre">Nombre y Apellido</label>
+        <input type="text" id="fNombre" autocomplete="off">
+      </div>
+      <div>
+        <label for="fProyecto">Nombre del Proyecto</label>
+        <input type="text" id="fProyecto" autocomplete="off">
+      </div>
+      <div>
+        <label for="fEmail">Email</label>
+        <input type="text" id="fEmail" autocomplete="off">
+      </div>
+      <div class="acciones">
+        <button type="submit" class="btn-buscar">Buscar</button>
+        <button type="button" class="btn-limpiar" onclick="limpiarFiltros()">Limpiar</button>
+      </div>
+    </form>
+    <table>
+      <thead>
+        <tr>
+          <th>Company Id</th>
+          <th>Nombre y Apellido</th>
+          <th>Nombre del Proyecto</th>
+          <th>Email</th>
+          <th>Pagos</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaClientes">
+        <!-- Clientes se insertan acá -->
+      </tbody>
+    </table>
+    <div id="panelPagos"></div>
+  </div>
+  <script>
+    // Base de clientes de ejemplo
+    const clientes = [
+      { companyId: "A001", nombre: "Lucía Rodríguez", proyecto: "Estudio de Belleza Glam", email: "lucia.glam@gmail.com", telefono: "221-5469871" },
+      { companyId: "A002", nombre: "Mariano Torres", proyecto: "Barbería El Tano", email: "marianotano@mail.com", telefono: "221-7834541" },
+      { companyId: "A003", nombre: "Sandra Rivas", proyecto: "Spa & Nails Rivas", email: "sandra.nails@outlook.com", telefono: "221-1257834" },
+      { companyId: "A004", nombre: "Valentina Ríos", proyecto: "Peluquería VR", email: "valen.rios@vrhair.com", telefono: "221-9982341" },
+      { companyId: "A005", nombre: "Gastón Peralta", proyecto: "Corte Urbano", email: "gastonp@urbano.com.ar", telefono: "221-1135687" },
+      { companyId: "A006", nombre: "Florencia Paredes", proyecto: "Depilación Láser Glow", email: "florparedes@gmail.com", telefono: "221-3218874" },
+      { companyId: "A007", nombre: "Cecilia López", proyecto: "Studio de Manos y Pies", email: "cecilia.lopez@manosypies.com", telefono: "221-6632877" },
+      { companyId: "A008", nombre: "Martín Ocampo", proyecto: "Barber Shop MO", email: "martin.ocampo@barbermo.com", telefono: "221-2234881" },
+      { companyId: "A009", nombre: "Paula Álvarez", proyecto: "Makeup by Paula", email: "paula.makeup@paula.com", telefono: "221-7781129" },
+      { companyId: "A010", nombre: "Juan Pablo Álvarez", proyecto: "JP Barbería", email: "jp.alvarez@jpbarber.com", telefono: "221-3219987" },
+      { companyId: "A011", nombre: "Carolina Acuña", proyecto: "Beauty Room", email: "caro.acuna@beautyroom.com", telefono: "221-8821674" },
+      { companyId: "A012", nombre: "Diego Funes", proyecto: "Peluquería Caballeros DF", email: "dfunes@peludf.com", telefono: "221-9091123" }
+    ];
+
+    // Base de pagos de ejemplo
+    let pagos = [
+      { companyId: "A001", monto: 32000, fecha: "2025-07-05", proximo: "2025-08-05", meses: 1 },
+      { companyId: "A001", monto: 90000, fecha: "2025-04-05", proximo: "2025-07-05", meses: 3 },
+      { companyId: "A002", monto: 32000, fecha: "2025-07-03", proximo: "2025-08-03", meses: 1 },
+      { companyId: "A002", monto: 90000, fecha: "2025-04-03", proximo: "2025-07-03", meses: 3 },
+      { companyId: "A002", monto: 88000, fecha: "2025-01-03", proximo: "2025-04-03", meses: 3 },
+      { companyId: "A003", monto: 96000, fecha: "2025-06-25", proximo: "2025-09-25", meses: 3 },
+      { companyId: "A004", monto: 32000, fecha: "2025-07-10", proximo: "2025-08-10", meses: 1 },
+      { companyId: "A005", monto: 32000, fecha: "2025-06-29", proximo: "2025-07-29", meses: 1 },
+      { companyId: "A006", monto: 90000, fecha: "2025-04-15", proximo: "2025-07-15", meses: 3 },
+      { companyId: "A007", monto: 32000, fecha: "2025-07-01", proximo: "2025-08-01", meses: 1 },
+      { companyId: "A009", monto: 32000, fecha: "2025-07-08", proximo: "2025-08-08", meses: 1 },
+      { companyId: "A011", monto: 88000, fecha: "2025-06-15", proximo: "2025-09-15", meses: 3 }
+    ];
+
+    let formPagoAbiertoPara = null;
+    let editandoPagoKey = null;
+
+    function mostrarClientes(filtrados) {
+      const cuerpo = document.getElementById('tablaClientes');
+      cuerpo.innerHTML = "";
+      if (!filtrados.length) {
+        cuerpo.innerHTML = `<tr class="no-result"><td colspan="6">No se encontraron resultados.</td></tr>`;
+        document.getElementById('panelPagos').innerHTML = "";
+        return;
+      }
+      filtrados.forEach(cliente => {
+        const pagosCliente = pagos.filter(p => p.companyId === cliente.companyId);
+        const badgePagos = `<span class="badge-pagos">${pagosCliente.length}</span>`;
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${cliente.companyId}</td>
+          <td>${cliente.nombre}</td>
+          <td>${cliente.proyecto}</td>
+          <td>${cliente.email}</td>
+          <td style="text-align:center">${badgePagos}</td>
+          <td style="text-align:center">
+            <button class="ver-pagos-btn" onclick="verPagosClick(event, '${cliente.companyId}')">
+              <i class="lucide lucide-eye"></i> Ver pagos
+            </button>
+          </td>
+        `;
+        if (cliente.companyId === window._clienteSeleccionado) fila.classList.add('seleccionado');
+        cuerpo.appendChild(fila);
+      });
+      if (!window._clienteSeleccionado) document.getElementById('panelPagos').innerHTML = ""; // Oculta panel si se busca de nuevo
+    }
+
+    function buscarClientes(e) {
+      if (e) e.preventDefault();
+      window._clienteSeleccionado = null;
+      formPagoAbiertoPara = null
+      editandoPagoKey = null;
+      const companyId = document.getElementById('fCompanyId').value.trim().toLowerCase();
+      const nombre = document.getElementById('fNombre').value.trim().toLowerCase();
+      const proyecto = document.getElementById('fProyecto').value.trim().toLowerCase();
+      const email = document.getElementById('fEmail').value.trim().toLowerCase();
+
+      const filtrados = clientes.filter(c =>
+        (companyId === ""   || c.companyId.toLowerCase().includes(companyId)) &&
+        (nombre === ""      || c.nombre.toLowerCase().includes(nombre)) &&
+        (proyecto === ""    || c.proyecto.toLowerCase().includes(proyecto)) &&
+        (email === ""       || c.email.toLowerCase().includes(email))
+      );
+      mostrarClientes(filtrados);
+    }
+
+    function limpiarFiltros() {
+      document.getElementById('fCompanyId').value = "";
+      document.getElementById('fNombre').value = "";
+      document.getElementById('fProyecto').value = "";
+      document.getElementById('fEmail').value = "";
+      window._clienteSeleccionado = null;
+      formPagoAbiertoPara = null;
+      editandoPagoKey = null;
+      buscarClientes();
+    }
+
+    function verPagosClick(e, companyId) {
+      e.stopPropagation();
+      window._clienteSeleccionado = companyId;
+      formPagoAbiertoPara = null;
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === companyId);
+      mostrarClientes(
+        clientes.filter(c => {
+          const companyIdF = document.getElementById('fCompanyId').value.trim().toLowerCase();
+          const nombreF = document.getElementById('fNombre').value.trim().toLowerCase();
+          const proyectoF = document.getElementById('fProyecto').value.trim().toLowerCase();
+          const emailF = document.getElementById('fEmail').value.trim().toLowerCase();
+          return (
+            (companyIdF === ""   || c.companyId.toLowerCase().includes(companyIdF)) &&
+            (nombreF === ""      || c.nombre.toLowerCase().includes(nombreF)) &&
+            (proyectoF === ""    || c.proyecto.toLowerCase().includes(proyectoF)) &&
+            (emailF === ""       || c.email.toLowerCase().includes(emailF))
+          );
+        })
+      );
+      mostrarPagosCliente(cliente);
+      setTimeout(() => {
+        document.getElementById('panelPagos')?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+
+    function cerrarPanelPagos() {
+      document.getElementById('panelPagos').innerHTML = "";
+      window._clienteSeleccionado = null;
+      formPagoAbiertoPara = null;
+      editandoPagoKey = null;
+      mostrarClientes(
+        clientes.filter(c => {
+          const companyIdF = document.getElementById('fCompanyId').value.trim().toLowerCase();
+          const nombreF = document.getElementById('fNombre').value.trim().toLowerCase();
+          const proyectoF = document.getElementById('fProyecto').value.trim().toLowerCase();
+          const emailF = document.getElementById('fEmail').value.trim().toLowerCase();
+          return (
+            (companyIdF === ""   || c.companyId.toLowerCase().includes(companyIdF)) &&
+            (nombreF === ""      || c.nombre.toLowerCase().includes(nombreF)) &&
+            (proyectoF === ""    || c.proyecto.toLowerCase().includes(proyectoF)) &&
+            (emailF === ""       || c.email.toLowerCase().includes(emailF))
+          );
+        })
+      );
+    }
+
+    function mostrarPagosCliente(cliente) {
+      const pagosCliente = pagos
+        .map((p, i) => ({...p, _idx: i}))
+        .filter(p => p.companyId === cliente.companyId)
+        .sort((a, b) => b.fecha.localeCompare(a.fecha)); // Más reciente primero
+
+      const panel = document.getElementById('panelPagos');
+      const hoy = new Date().toISOString().slice(0, 10);
+
+      let contenido = `
+        <div class="panel-pagos">
+          <button class="close-panel" onclick="cerrarPanelPagos()" title="Cerrar panel"><i class="lucide lucide-x"></i></button>
+          <div class="info-cliente">
+            <i class="lucide lucide-user-round"></i> ${cliente.nombre} 
+            &nbsp; <i class="lucide lucide-mail"></i> ${cliente.email}
+            &nbsp; <i class="lucide lucide-phone"></i> ${cliente.telefono}
+          </div>
+      `;
+
+      if (!pagosCliente.length && formPagoAbiertoPara !== cliente.companyId) {
+        contenido += `
+          <h3>No hay pagos registrados</h3>
+          <div class="sin-pagos">Todavía no se han registrado pagos para este cliente.</div>
+          <button class="btn-agregar" onclick="abrirFormAgregarPago('${cliente.companyId}')">Agregar pago</button>
+        </div>
+        `;
+        panel.innerHTML = contenido;
+        return;
+      }
+
+      if (formPagoAbiertoPara === cliente.companyId) {
+        contenido += formAgregarPagoHTML(cliente);
+      } else {
+        contenido += `
+          <h3>Pagos registrados (${pagosCliente.length})</h3>
+          <button class="btn-agregar" onclick="abrirFormAgregarPago('${cliente.companyId}')">Agregar pago</button>
+          <table>
+            <thead>
+              <tr>
+                <th>Monto</th>
+                <th>Fecha</th>
+                <th>Próximo pago</th>
+                <th>Meses pagados</th>
+                <th>Email cliente</th>
+                <th>Nombre y Apellido</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pagosCliente.map((p, idx) => editandoPagoKey === p._idx
+                ? formEditarPagoHTML(cliente, p, idx)
+                : `
+                <tr>
+                  <td>$${p.monto.toLocaleString("es-AR")}</td>
+                  <td>${p.fecha}</td>
+                  <td class="${p.proximo < hoy ? 'proximo-vencido' : ''}">
+                    ${p.proximo}
+                    ${p.proximo < hoy ? ' <span title="Pago vencido">⚠️</span>' : ''}
+                  </td>
+                  <td>${p.meses}</td>
+                  <td>${cliente.email}</td>
+                  <td>${cliente.nombre}</td>
+                  <td>${cliente.telefono}</td>
+                  <td class="acciones-pago">
+                    <button class="btn-editar" onclick="editarPago(${p._idx})"><i class='lucide lucide-pencil'></i> Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarPago(${p._idx}, '${cliente.companyId}')"><i class='lucide lucide-trash'></i> Eliminar</button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+        `;
+      }
+      panel.innerHTML = contenido;
+    }
+
+    function abrirFormAgregarPago(companyId) {
+      formPagoAbiertoPara = companyId;
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === companyId);
+      mostrarPagosCliente(cliente);
+      setTimeout(() => {
+        document.getElementById('panelPagos')?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+
+    function cancelarAgregarPago() {
+      formPagoAbiertoPara = null;
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === window._clienteSeleccionado);
+      mostrarPagosCliente(cliente);
+    }
+
+    function formAgregarPagoHTML(cliente) {
+      const hoy = new Date().toISOString().slice(0, 10);
+      return `
+        <form class="form-agregar" onsubmit="guardarPago(event, '${cliente.companyId}')">
+          <div>
+            <label>Monto ($):</label>
+            <input type="number" name="monto" min="1" step="1" required>
+          </div>
+          <div>
+            <label>Fecha:</label>
+            <input type="date" name="fecha" max="9999-12-31" value="${hoy}" required>
+          </div>
+          <div>
+            <label>Próximo pago:</label>
+            <input type="date" name="proximo" max="9999-12-31" required>
+          </div>
+          <div>
+            <label>Meses pagados:</label>
+            <input type="number" name="meses" min="1" step="1" required>
+          </div>
+          <div class="acciones">
+            <button type="submit" class="btn-agregar">Guardar</button>
+            <button type="button" class="btn-cancelar" onclick="cancelarAgregarPago()">Cancelar</button>
+          </div>
+          <div id="msg-error" class="error-msg"></div>
+        </form>
+      `;
+    }
+
+    function guardarPago(e, companyId) {
+      e.preventDefault();
+      const form = e.target;
+      const monto = Number(form.monto.value);
+      const fecha = form.fecha.value;
+      const proximo = form.proximo.value;
+      const meses = Number(form.meses.value);
+
+      let error = "";
+      if (!monto || monto <= 0) error = "El monto debe ser mayor a cero.";
+      else if (!fecha) error = "Debés ingresar la fecha.";
+      else if (!proximo) error = "Debés ingresar la fecha del próximo pago.";
+      else if (!meses || meses <= 0) error = "Los meses pagados deben ser mayor a cero.";
+      else if (proximo < fecha) error = "La fecha del próximo pago no puede ser anterior a la fecha del pago.";
+
+      if (error) {
+        form.querySelector("#msg-error").textContent = error;
+        return;
+      }
+
+      pagos.push({
+        companyId,
+        monto,
+        fecha,
+        proximo,
+        meses
+      });
+      formPagoAbiertoPara = null;
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === companyId);
+      mostrarPagosCliente(cliente);
+      mostrarClientes(
+        clientes.filter(c => {
+          const companyIdF = document.getElementById('fCompanyId').value.trim().toLowerCase();
+          const nombreF = document.getElementById('fNombre').value.trim().toLowerCase();
+          const proyectoF = document.getElementById('fProyecto').value.trim().toLowerCase();
+          const emailF = document.getElementById('fEmail').value.trim().toLowerCase();
+          return (
+            (companyIdF === ""   || c.companyId.toLowerCase().includes(companyIdF)) &&
+            (nombreF === ""      || c.nombre.toLowerCase().includes(nombreF)) &&
+            (proyectoF === ""    || c.proyecto.toLowerCase().includes(proyectoF)) &&
+            (emailF === ""       || c.email.toLowerCase().includes(emailF))
+          );
+        })
+      );
+    }
+
+    function editarPago(idx) {
+      editandoPagoKey = idx;
+      formPagoAbiertoPara = null;
+      const cliente = clientes.find(c => c.companyId === window._clienteSeleccionado);
+      mostrarPagosCliente(cliente);
+      setTimeout(() => {
+        document.getElementById('panelPagos')?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+
+    function cancelarEditarPago() {
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === window._clienteSeleccionado);
+      mostrarPagosCliente(cliente);
+    }
+
+    function formEditarPagoHTML(cliente, pago, idx) {
+      return `
+        <tr>
+          <td colspan="8">
+            <form class="form-editar" onsubmit="guardarEdicionPago(event, ${idx}, '${cliente.companyId}')">
+              <div>
+                <label>Monto ($):</label>
+                <input type="number" name="monto" min="1" step="1" required value="${pago.monto}">
+              </div>
+              <div>
+                <label>Fecha:</label>
+                <input type="date" name="fecha" max="9999-12-31" value="${pago.fecha}" required>
+              </div>
+              <div>
+                <label>Próximo pago:</label>
+                <input type="date" name="proximo" max="9999-12-31" required value="${pago.proximo}">
+              </div>
+              <div>
+                <label>Meses pagados:</label>
+                <input type="number" name="meses" min="1" step="1" required value="${pago.meses}">
+              </div>
+              <div class="acciones">
+                <button type="submit" class="btn-guardar">Guardar</button>
+                <button type="button" class="btn-cancelar" onclick="cancelarEditarPago()">Cancelar</button>
+              </div>
+              <div id="msg-error-editar" class="error-msg"></div>
+            </form>
+          </td>
+        </tr>
+      `;
+    }
+
+    function guardarEdicionPago(e, idx, companyId) {
+      e.preventDefault();
+      const form = e.target;
+      const monto = Number(form.monto.value);
+      const fecha = form.fecha.value;
+      const proximo = form.proximo.value;
+      const meses = Number(form.meses.value);
+
+      let error = "";
+      if (!monto || monto <= 0) error = "El monto debe ser mayor a cero.";
+      else if (!fecha) error = "Debés ingresar la fecha.";
+      else if (!proximo) error = "Debés ingresar la fecha del próximo pago.";
+      else if (!meses || meses <= 0) error = "Los meses pagados deben ser mayor a cero.";
+      else if (proximo < fecha) error = "La fecha del próximo pago no puede ser anterior a la fecha del pago.";
+
+      if (error) {
+        form.querySelector("#msg-error-editar").textContent = error;
+        return;
+      }
+
+      const globalIdx = pagos.findIndex((p, i) => p.companyId === companyId && i === idx);
+      if (globalIdx > -1) {
+        pagos[globalIdx] = { companyId, monto, fecha, proximo, meses };
+      }
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === companyId);
+      mostrarPagosCliente(cliente);
+      mostrarClientes(
+        clientes.filter(c => {
+          const companyIdF = document.getElementById('fCompanyId').value.trim().toLowerCase();
+          const nombreF = document.getElementById('fNombre').value.trim().toLowerCase();
+          const proyectoF = document.getElementById('fProyecto').value.trim().toLowerCase();
+          const emailF = document.getElementById('fEmail').value.trim().toLowerCase();
+          return (
+            (companyIdF === ""   || c.companyId.toLowerCase().includes(companyIdF)) &&
+            (nombreF === ""      || c.nombre.toLowerCase().includes(nombreF)) &&
+            (proyectoF === ""    || c.proyecto.toLowerCase().includes(proyectoF)) &&
+            (emailF === ""       || c.email.toLowerCase().includes(emailF))
+          );
+        })
+      );
+    }
+
+    function eliminarPago(idx, companyId) {
+      if (!confirm('¿Estás seguro de que querés eliminar este pago?')) return;
+      // idx es la posición en el array pagos (usando _idx)
+      const realIdx = pagos.findIndex((p, i) => p.companyId === companyId && i === idx);
+      if (realIdx > -1) pagos.splice(realIdx, 1);
+      editandoPagoKey = null;
+      const cliente = clientes.find(c => c.companyId === companyId);
+      mostrarPagosCliente(cliente);
+      mostrarClientes(
+        clientes.filter(c => {
+          const companyIdF = document.getElementById('fCompanyId').value.trim().toLowerCase();
+          const nombreF = document.getElementById('fNombre').value.trim().toLowerCase();
+          const proyectoF = document.getElementById('fProyecto').value.trim().toLowerCase();
+          const emailF = document.getElementById('fEmail').value.trim().toLowerCase();
+          return (
+            (companyIdF === ""   || c.companyId.toLowerCase().includes(companyIdF)) &&
+            (nombreF === ""      || c.nombre.toLowerCase().includes(nombreF)) &&
+            (proyectoF === ""    || c.proyecto.toLowerCase().includes(proyectoF)) &&
+            (emailF === ""       || c.email.toLowerCase().includes(emailF))
+          );
+        })
+      );
+    }
+
+    // Inicial: mostrar todos
+    mostrarClientes(clientes);
+
+  </script>
