@@ -2,18 +2,40 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
+const fallbackClients = [
+  {
+    id: 'demo1',
+    companyId: 'A100',
+    nombre: 'Cliente Demo 1',
+    proyecto: 'Proyecto Demo 1',
+    email: 'demo1@example.com',
+  },
+  {
+    id: 'demo2',
+    companyId: 'A101',
+    nombre: 'Cliente Demo 2',
+    proyecto: 'Proyecto Demo 2',
+    email: 'demo2@example.com',
+  },
+];
+
 export default function ClientList({ onSelect }) {
   const [clients, setClients] = useState([]);
   const [filters, setFilters] = useState({ companyId: '', nombre: '', proyecto: '', email: '' });
 
   useEffect(() => {
     const fetchClients = async () => {
-      const querySnapshot = await getDocs(collection(db, 'clientes'));
-      const data = [];
-      querySnapshot.forEach((doc) => {
-        data.push({ id: doc.id, ...doc.data() });
-      });
-      setClients(data);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'clientes'));
+        const data = [];
+        querySnapshot.forEach((doc) => {
+          data.push({ id: doc.id, ...doc.data() });
+        });
+        setClients(data);
+      } catch (err) {
+        console.error(err);
+        setClients(fallbackClients);
+      }
     };
 
     fetchClients();
